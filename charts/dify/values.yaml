@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "0.6.16"
+    tag: "main"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -13,9 +13,9 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
-  web:    
+  web:
     repository: langgenius/dify-web
-    tag: "0.6.16"
+    tag: "main"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -25,7 +25,7 @@ image:
     #   - myRegistryKeySecretName
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.1"
+    tag: "0.2.6"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -76,8 +76,8 @@ api:
   #        name: my-secret
   #        key: DB_PASSWORD
   - name: CHECK_UPDATE_URL
-  # Won't check for update if left empty
-  #   value: https://updates.dify.ai
+    # Won't check for update if left empty
+    #   value: https://updates.dify.ai
     value: ""
   - name: CODE_MAX_NUMBER
     value: "9223372036854775807"
@@ -156,10 +156,10 @@ api:
       ## If set to "-", storageClassName: "", which disables dynamic provisioning
       ## If undefined (the default) or set to null, no storageClassName spec is
       ##   set, choosing the default provisioner.
-      ## ReadWriteMany access mode required for `api` and `worker`
+      ## ReadWriteOnce access mode required for `api` and `worker`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
 
@@ -213,10 +213,10 @@ proxy:
         ## If set to "-", storageClassName: "", which disables dynamic provisioning
         ## If undefined (the default) or set to null, no storageClassName spec is
         ##   set, choosing the default provisioner.
-        ## ReadWriteMany access mode required for nginx
+        ## ReadWriteOnce access mode required for nginx
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -262,8 +262,7 @@ sandbox:
     clusterIP: ""
   auth:
     apiKey: "dify-sandbox"
-  privileged:
-    false
+  privileged: false
 
 ssrfProxy:
   enabled: false
@@ -292,10 +291,10 @@ ssrfProxy:
         ## If set to "-", storageClassName: "", which disables dynamic provisioning
         ## If undefined (the default) or set to null, no storageClassName spec is
         ##   set, choosing the default provisioner.
-        ## ReadWriteMany access mode required for squid
+        ## ReadWriteOnce access mode required for squid
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -334,7 +333,7 @@ postgresql:
       enabled: true
       storageClass: ""
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       size: 8Gi
 
     ## @param primary.affinity Affinity for PostgreSQL primary pods assignment
@@ -360,7 +359,7 @@ postgresql:
       enabled: true
       storageClass: ""
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       size: 8Gi
 
     ## @param readReplicas.affinity Affinity for PostgreSQL read only pods assignment
@@ -396,16 +395,16 @@ weaviate:
   # example setting the nofile limit
   command: ["/bin/weaviate"]
   args:
-    - '--host'
-    - '0.0.0.0'
-    - '--port'
-    - '8080'
-    - '--scheme'
-    - 'http'
-    - '--config-file'
-    - '/weaviate-config/conf.yaml'
-    - --read-timeout=60s 
-    - --write-timeout=60s
+  - '--host'
+  - '0.0.0.0'
+  - '--port'
+  - '8080'
+  - '--scheme'
+  - 'http'
+  - '--config-file'
+  - '/weaviate-config/conf.yaml'
+  - --read-timeout=60s
+  - --write-timeout=60s
 
   # below is an example that can be used to set an arbitrary nofile limit at
   # startup:
@@ -432,7 +431,7 @@ weaviate:
         repo: alpine
         tag: latest
         pullPolicy: IfNotPresent
-    
+
     extraInitContainers: {}
     # - image: some-image
     #   name: some-name
@@ -442,12 +441,12 @@ weaviate:
   # break usability. Full dynamic scalability will be added in a future release.
   replicas: 1
   resources: {}
-    # requests:
-    #   cpu: '500m'
-    #   memory: '300Mi'
-    # limits:
-    #   cpu: '1000m'
-    #   memory: '1Gi'
+  # requests:
+  #   cpu: '500m'
+  #   memory: '300Mi'
+  # limits:
+  #   cpu: '1000m'
+  #   memory: '1Gi'
 
 
   # Add a service account ot the Weaviate pods if you need Weaviate to have permissions to
@@ -521,14 +520,14 @@ weaviate:
       enabled: true
       # Any number of allowed API Keys as plain text
       allowed_keys:
-        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+      - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
       # You can either set a single user for all the listed Allowed API keys OR
       # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
       # length(apikey.users) == 1
       # Only the first user-key pair will be used by `dify.api` and `dify-worker`
       # NOTE: Make sure the lister Users are added to the Authorization as well.
       users:
-        - hello@dify.ai
+      - hello@dify.ai
     oidc:
       enabled: false
       # issuer: ''
@@ -608,8 +607,8 @@ weaviate:
     AUTHORIZATION_ADMINLIST_ENABLED: 'true'
     AUTHORIZATION_ADMINLIST_USERS: 'hello@dify.ai'
   envSecrets:
-    # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: name-of-the-k8s-secret-containing-the-comma-separated-api-keys
+  # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
+  # AUTHENTICATION_APIKEY_ALLOWED_KEYS: name-of-the-k8s-secret-containing-the-comma-separated-api-keys
 
   # Configure backup providers
   backups:
@@ -620,7 +619,7 @@ weaviate:
       envconfig:
         # Configure folder where backups should be saved
         BACKUP_FILESYSTEM_PATH: /tmp/backups
-    
+
     s3:
       enabled: false
       # If one is using AWS EKS and has already configured K8s Service Account
@@ -761,15 +760,15 @@ weaviate:
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchExpressions:
-                - key: "app"
-                  operator: In
-                  values:
-                    - weaviate
+      - weight: 1
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+            - key: "app"
+              operator: In
+              values:
+              - weaviate
 
 service:
   type: ClusterIP
@@ -779,36 +778,36 @@ ingress:
   enabled: false
   className: ""
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    # nginx.ingress.kubernetes.io/proxy-body-size: 15m
-    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  # nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  # nginx.ingress.kubernetes.io/proxy-body-size: 15m
+  # nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: dify-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-    # - host: dify-example2.local
-    #   paths:
-    #     - path: /
-    #       pathType: Prefix
+  - host: dify-example.local
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+      # - host: dify-example2.local
+      #   paths:
+      #     - path: /
+      #       pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - dify-example.local
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
 
 
 # Global node selector
@@ -896,11 +895,11 @@ redis:
     ## @param diagnosticMode.command Command to override all containers in the deployment
     ##
     command:
-      - sleep
+    - sleep
     ## @param diagnosticMode.args Args to override all containers in the deployment
     ##
     args:
-      - infinity
+    - infinity
 
   ## @section Redis&reg; Image parameters
   ##
@@ -998,8 +997,8 @@ redis:
     ## ref: https://redis.io/topics/security#disabling-of-specific-commands
     ##
     disableCommands:
-      - FLUSHDB
-      - FLUSHALL
+    - FLUSHDB
+    - FLUSHALL
     ## @param master.command Override default container command (useful when using custom images)
     ##
     command: []
@@ -1275,7 +1274,7 @@ redis:
       ## @param master.persistence.accessModes Persistent Volume access modes
       ##
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       ## @param master.persistence.size Persistent Volume size
       ##
       size: 8Gi
@@ -1399,8 +1398,8 @@ redis:
     ## ref: https://redis.io/topics/security#disabling-of-specific-commands
     ##
     disableCommands:
-      - FLUSHDB
-      - FLUSHALL
+    - FLUSHDB
+    - FLUSHALL
     ## @param replica.command Override default container command (useful when using custom images)
     ##
     command: []
@@ -1692,7 +1691,7 @@ redis:
       ## @param replica.persistence.accessModes Persistent Volume access modes
       ##
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       ## @param replica.persistence.size Persistent Volume size
       ##
       size: 8Gi
@@ -1986,7 +1985,7 @@ redis:
       ## @param sentinel.persistence.accessModes Persistent Volume access modes
       ##
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       ## @param sentinel.persistence.size Persistent Volume size
       ##
       size: 100Mi
