@@ -25,7 +25,7 @@ image:
     #   - myRegistryKeySecretName
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.6"
+    tag: "0.2.9"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -771,7 +771,8 @@ weaviate:
               - weaviate
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
+  # type: ClusterIP
   port: 80
 
 ingress:
